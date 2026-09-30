@@ -10,6 +10,11 @@ const nextConfig = {
   // workspace superior si hay lockfiles en carpetas padre; rompe el
   // despliegue en Vercel en ese caso).
   outputFileTracingRoot: projectDir,
+  // Excluye del trazado lo que nunca se ejecuta en runtime (acelera
+  // "Collecting build traces" y evita que archivos pesados lo atasquen).
+  outputFileTracingExcludes: {
+    "*": ["./rust-physics/**", "./lancedb/**", "./node_modules/.cache/**"],
+  },
   // Allow async WebAssembly so the Rust physics engine can load client-side.
   webpack(config) {
     config.experiments = { ...config.experiments, asyncWebAssembly: true };
