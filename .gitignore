@@ -7,3 +7,5 @@ dist/
 /target/
 rust-physics/target/
 public/wasm/
+lancedb/
+.vercel/

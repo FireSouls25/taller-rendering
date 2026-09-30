@@ -1,0 +1,5 @@
+# No subir a Vercel: datos locales y artefactos pesados.
+lancedb/
+rust-physics/target/
+*.log
+.next/
