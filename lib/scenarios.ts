@@ -80,10 +80,12 @@ function makeBody(
   vy: number,
   mass: number,
   color: string,
-  name?: string
+  name?: string,
+  z = 0,
+  vz = 0
 ): Body {
   const radius = Math.cbrt(mass) * 1.6 + 2;
-  return { id: nextId++, x, y, vx, vy, mass, radius, color, name };
+  return { id: nextId++, x, y, z, vx, vy, vz, mass, radius, color, name, gMul: 1 };
 }
 
 function circularOrbitVelocity(centralMass: number, r: number, G: number) {
@@ -113,10 +115,12 @@ function solarSystem(seed: number): SimState {
     const x = Math.cos(angle) * p.r;
     const y = Math.sin(angle) * p.r;
     const v = circularOrbitVelocity(sunMass, p.r, G);
-    // tangential velocity (counter-clockwise)
+    // Velocidad tangencial (antihoraria) + ligera inclinación orbital 3D.
     const vx = -Math.sin(angle) * v;
     const vy = Math.cos(angle) * v;
-    bodies.push(makeBody(x, y, vx, vy, p.mass, p.color, p.name));
+    const z = (rand() - 0.5) * 22;
+    const vz = (rand() - 0.5) * 5;
+    bodies.push(makeBody(x, y, vx, vy, p.mass, p.color, p.name, z, vz));
   }
   return { scenario: "solar-system", seed, bodies, G, dt: DT_DEFAULT, time: 0 };
 }
@@ -126,11 +130,11 @@ function binaryStar(seed: number): SimState {
   const G = G_DEFAULT;
   const starMass = 500;
   const d = 90;
-  // Two stars in circular orbit around barycenter.
+  // Dos estrellas en órbita circular alrededor del baricentro.
   const vStar = Math.sqrt((G * starMass) / (4 * d));
   const bodies: Body[] = [
-    makeBody(-d, 0, 0, -vStar, starMass, "#fbbf24", "A"),
-    makeBody(d, 0, 0, vStar, starMass, "#fb923c", "B"),
+    makeBody(-d, 0, 0, -vStar, starMass, "#fbbf24", "A", -12, 4),
+    makeBody(d, 0, 0, vStar, starMass, "#fb923c", "B", 12, -4),
   ];
   const rand = mulberry32(seed);
   const colors = ["#38bdf8", "#a78bfa", "#34d399", "#f472b6", "#facc15", "#94a3b8"];
@@ -144,7 +148,8 @@ function binaryStar(seed: number): SimState {
       makeBody(
         x, y,
         -Math.sin(angle) * v, Math.cos(angle) * v,
-        1 + rand() * 3, colors[i % colors.length]
+        1 + rand() * 3, colors[i % colors.length],
+        undefined, (rand() - 0.5) * 90, (rand() - 0.5) * 10
       )
     );
   }
@@ -155,10 +160,11 @@ function threeBody(seed: number): SimState {
   nextId = 1;
   const G = G_DEFAULT;
   void seed;
+  // Danza 3D real: posiciones y velocidades fuera del plano.
   const bodies: Body[] = [
-    makeBody(-80, 0, 12, 18, 120, "#38bdf8", "Alpha"),
-    makeBody(80, 0, -12, -18, 120, "#f472b6", "Beta"),
-    makeBody(0, 90, 26, 0, 120, "#a3e635", "Gamma"),
+    makeBody(-80, 0, 12, 18, 120, "#38bdf8", "Alpha", -35, 14),
+    makeBody(80, 0, -12, -18, 120, "#f472b6", "Beta", 30, -12),
+    makeBody(0, 90, 26, 0, 120, "#a3e635", "Gamma", 55, -8),
   ];
   return { scenario: "three-body", seed, bodies, G, dt: DT_DEFAULT, time: 0 };
 }
@@ -170,16 +176,21 @@ function chaos(seed: number, n = 50): SimState {
   const palette = ["#38bdf8", "#a78bfa", "#34d399", "#f472b6", "#facc15", "#fb923c", "#94a3b8"];
   const bodies: Body[] = [];
   for (let i = 0; i < n; i++) {
-    const angle = rand() * Math.PI * 2;
+    // Nube esférica 3D: dirección aleatoria sobre la esfera + radio.
+    const theta = rand() * Math.PI * 2;
+    const zAxis = 2 * rand() - 1;
+    const s = Math.sqrt(Math.max(0, 1 - zAxis * zAxis));
     const r = 40 + rand() * 340;
-    const x = Math.cos(angle) * r;
-    const y = Math.sin(angle) * r;
+    const x = s * Math.cos(theta) * r;
+    const y = s * Math.sin(theta) * r;
+    const z = zAxis * r * 0.8;
     bodies.push(
       makeBody(
         x, y,
         (rand() - 0.5) * 60, (rand() - 0.5) * 60,
         2 + rand() * 22,
-        palette[i % palette.length]
+        palette[i % palette.length],
+        undefined, z, (rand() - 0.5) * 60
       )
     );
   }

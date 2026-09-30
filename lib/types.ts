@@ -1,13 +1,17 @@
 export interface Body {
   id: number;
-  x: number; // world units, origin at center
+  x: number; // unidades de mundo, origen en el centro
   y: number;
+  z: number;
   vx: number;
   vy: number;
+  vz: number;
   mass: number;
   radius: number;
   color: string;
   name?: string;
+  /** Multiplicador de influencia gravitatoria: cuánto atrae a los demás (1 = normal). */
+  gMul: number;
 }
 
 export type ScenarioSlug =
@@ -29,6 +33,10 @@ export interface SimState {
 }
 
 export type RenderingMode = "CSR" | "SSR" | "SSG" | "ISR";
+
+export type ViewMode = "3d" | "2d";
+
+export type CollisionMode = "merge" | "bounce" | "off";
 
 export interface EngineStatus {
   backend: "WASM" | "TypeScript (fallback)";
