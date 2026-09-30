@@ -133,6 +133,27 @@ export function useSimulation(opts: { initial: SimState; mode: RenderingMode }) 
     setBodies([...core.bodies]);
   }, [core]);
 
+  // El escenario cambia por navegación (mismo montaje en CSR/SSR):
+  // reinicia la simulación de inmediato con el nuevo estado inicial.
+  useEffect(() => {
+    const fresh = initial.bodies.map((b) => ({ ...b }));
+    if (core.view === "2d") {
+      for (const b of fresh) {
+        b.z = 0;
+        b.vz = 0;
+      }
+    }
+    core.bodies = fresh;
+    core.time = 0;
+    core.selectedId = null;
+    core.dragId = null;
+    core.gen++;
+    setSelectedId(null);
+    setTime(0);
+    setBodies(fresh);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initial]);
+
   const select = useCallback(
     (id: number | null) => {
       core.selectedId = id;
