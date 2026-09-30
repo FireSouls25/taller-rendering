@@ -4,7 +4,7 @@
   "private": true,
   "description": "Gravity Lab — Rendering Patterns Workshop: one simulation, one physics engine, four rendering strategies.",
   "engines": {
-    "node": ">=20"
+    "node": "24.x"
   },
   "scripts": {
     "dev": "next dev",
@@ -16,9 +16,9 @@
     "wasm:build:docker": "echo 'If you lack wasm-pack locally, run: docker run --rm -v $(pwd)/rust-physics:/work -w /work rust:1.75 bash -c \"rustup target add wasm32-unknown-unknown && cargo install wasm-bindgen-cli && cargo build --release --target wasm32-unknown-unknown && wasm-bindgen --target web --out-dir /work/../public/wasm --out-name gravity_physics target/wasm32-unknown-unknown/release/rust_physics.wasm\"'"
   },
   "dependencies": {
-    "next": "15.5.4",
-    "react": "19.1.1",
-    "react-dom": "19.1.1",
+    "next": "^15.5.7",
+    "react": "^19.1.2",
+    "react-dom": "^19.1.2",
     "three": "^0.186.1"
   },
   "devDependencies": {
@@ -28,7 +28,7 @@
     "@types/react-dom": "^19",
     "@types/three": "^0.186.0",
     "eslint": "^9",
-    "eslint-config-next": "15.5.4",
+    "eslint-config-next": "^15.5.7",
     "typescript": "^5"
   }
 }
